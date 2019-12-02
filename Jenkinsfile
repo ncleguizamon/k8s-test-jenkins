@@ -11,14 +11,6 @@ spec:
   containers:
   - name: maven
     image: maven:alpine
-    command:
-    - cat
-    tty: true
-  - name: busybox
-    image: busybox
-    command:
-    - cat
-    tty: true
 """
     }
   }
