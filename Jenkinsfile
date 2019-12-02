@@ -1,7 +1,7 @@
 pipeline {
   agent {
     kubernetes {
-      label 'parent-pod'
+      label 'middleware'
       yaml """
 spec:
   containers:
