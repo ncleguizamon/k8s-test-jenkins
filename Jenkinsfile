@@ -6,7 +6,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    some-label: some-label-value
+    app: jenkins
 spec:
   containers:
   - name: maven
