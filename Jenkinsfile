@@ -30,7 +30,7 @@ spec:
             }
         }
       steps {
-        ...
+          sh("echo 'hi'")
       }
     }
   }
