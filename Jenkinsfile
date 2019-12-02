@@ -1,22 +1,37 @@
 pipeline {
   agent {
     kubernetes {
-      yamlFile 'KubernetesPod.yaml'
+      label 'parent-pod'
+      yaml """
+spec:
+  containers:
+  - name: golang
+    image: golang:1.6.3-alpine
+    command:
+    - cat
+    tty: true
+"""
     }
   }
   stages {
     stage('Run maven') {
+        agent {
+            kubernetes {
+                label 'nested-pod'
+                yaml """
+spec:
+  containers:
+  - name: maven
+    image: maven:3.3.9-jdk-8-alpine
+    command:
+    - cat
+    tty: true
+"""
+            }
+        }
       steps {
-        sh 'set'
-        sh "echo OUTSIDE_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}"
-        container('maven') {
-          sh 'echo MAVEN_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
-          sh 'mvn -version'
-        }
-        container('busybox') {
-          sh 'echo BUSYBOX_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
-          sh '/bin/busybox'
-        }
+        ...
       }
     }
   }
+}
