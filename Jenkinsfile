@@ -1,30 +1,22 @@
-podTemplate(containers: [
-    containerTemplate(name: 'maven', image: 'maven:3.3.9-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
-    //containerTemplate(name: 'golang', image: 'golang:1.8.0', ttyEnabled: true, command: 'cat')
-  ]) {
-
-    node(POD_LABEL) {
-        stage('Get a Maven project') {
-            git 'https://github.com/jenkinsci/kubernetes-plugin.git'
-            container('maven') {
-                stage('Build a Maven project') {
-                    sh 'mvn -B clean install'
-                }
-            }
-        }
-
-        stage('Get a Golang project') {
-            git url: 'https://github.com/hashicorp/terraform.git'
-            container('golang') {
-                stage('Build a Go project') {
-                    sh """
-                    mkdir -p /go/src/github.com/hashicorp
-                    ln -s `pwd` /go/src/github.com/hashicorp/terraform
-                    cd /go/src/github.com/hashicorp/terraform && make core-dev
-                    """
-                }
-            }
-        }
-
+pipeline {
+  agent {
+    kubernetes {
+      yamlFile 'KubernetesPod.yaml'
     }
-}
+  }
+  stages {
+    stage('Run maven') {
+      steps {
+        sh 'set'
+        sh "echo OUTSIDE_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}"
+        container('maven') {
+          sh 'echo MAVEN_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
+          sh 'mvn -version'
+        }
+        container('busybox') {
+          sh 'echo BUSYBOX_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
+          sh '/bin/busybox'
+        }
+      }
+    }
+  }
