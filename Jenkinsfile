@@ -1,24 +1,11 @@
 pipeline {
   agent {
     kubernetes {
-      yaml """
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: maven
-    image: maven:alpine
-"""
-    }
-  }
-  stages {
-    stage('Run maven') {
-      steps {
-        container('maven') {
-          sh 'mvn -version'
+     podTemplate {
+    node(Jenkins-slave) {
+        stage('Run shell') {
+            sh 'echo hello world'
         }
-
-      }
     }
-  }
+}
 }
